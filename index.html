@@ -21,7 +21,7 @@
         html { scroll-behavior: smooth; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
 
-        /* --- NAVIGATION (BLACK & STICKY) --- */
+        /* --- NAVIGATION (BLACK, STICKY & RESPONSIVE) --- */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 15px 5%; 
@@ -38,7 +38,7 @@
         .nav-contact { color: var(--gold); font-weight: 700; font-size: 0.85rem; }
 
         .menu-toggle { display: none; flex-direction: column; cursor: pointer; gap: 5px; }
-        .menu-toggle span { width: 25px; height: 2px; background: #fff; }
+        .menu-toggle span { width: 25px; height: 2px; background: #fff; transition: 0.3s; }
 
         /* --- SECTIONS --- */
         section { padding: 100px 5%; }
@@ -70,8 +70,8 @@
         /* Contact Section */
         .contact-container { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
         .form-group { margin-bottom: 20px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 15px; border: 1px solid #ddd; font-family: inherit; font-size: 1rem; border-radius: 3px; }
-        .form-group input:focus { outline: none; border-color: var(--gold); }
+        .form-group input, .form-group textarea { width: 100%; padding: 15px; border: 1px solid #ddd; font-family: inherit; font-size: 1rem; border-radius: 3px; transition: 0.3s; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--gold); }
         
         .btn-main { padding: 20px 45px; background: #000; color: #fff; text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; cursor: pointer; border: none; transition: var(--transition); display: inline-block; text-decoration: none; text-align: center; }
         .btn-main:hover { background: var(--gold); transform: translateY(-3px); }
@@ -89,15 +89,18 @@
         .footer-bottom { border-top: 1px solid #222; padding-top: 40px; display: flex; justify-content: space-between; font-size: 0.75rem; color: #555; }
 
         /* WhatsApp */
-        .wa-float { position: fixed; bottom: 30px; right: 30px; background: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 3000; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .wa-float { position: fixed; bottom: 30px; right: 30px; background: #25D366; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 3000; box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: 0.3s; }
+        .wa-float:hover { transform: scale(1.1); }
         .wa-float svg { width: 30px; fill: white; }
 
         /* --- RESPONSIVE LOGIC --- */
         @media (max-width: 992px) {
+            section { padding: 60px 5%; }
             .hero-grid, .bio-content, .contact-container, .footer-grid { grid-template-columns: 1fr; text-align: center; }
             .bg-text { display: none; }
             .profile-img-box img { transform: rotate(0); margin: 40px auto 0; }
             .btn-main { width: 100%; }
+            .contact-container { gap: 40px; }
             
             .menu-toggle { display: flex; }
             .nav-menu {
@@ -106,11 +109,13 @@
                 display: none; border-top: 1px solid #222;
             }
             .nav-menu.active { display: flex; }
+            .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
         }
     </style>
 </head>
 <body>
 
+    <!-- STICKY NAVIGATION -->
     <nav class="navbar">
         <a href="#" class="logo">SAIFUL<span>.</span></a>
         <div class="menu-toggle" id="mobile-menu">
@@ -124,21 +129,24 @@
         </ul>
     </nav>
 
+    <!-- HERO SECTION -->
     <section class="hero">
         <div class="bg-text">FREELANCE</div>
         <div class="hero-grid">
             <div class="hero-text">
                 <span class="section-label">Web Designer & SEO Expert</span>
                 <h1>Crafting Premium <i>Web Experiences.</i></h1>
-                <p style="font-size: 1.2rem; color: var(--muted); margin-bottom: 40px;">Specializing in Wix, Shopify, and WordPress. I build high-end digital solutions that convert visitors into loyal clients.</p>
+                <p style="font-size: 1.2rem; color: var(--muted); margin-bottom: 40px;">Professional developer specializing in Wix, Shopify, and WordPress. I bridge the gap between high-end design and technical SEO performance.</p>
                 <a href="#contact" class="btn-main">Work With Me</a>
             </div>
             <div class="profile-img-box">
+                <!-- Fallback to Unsplash if your Upwork photo link expires -->
                 <img src="https://www.upwork.com/freelancers/~010f9525a841462136/image" alt="Saiful Profile" onerror="this.src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=800&q=80'">
             </div>
         </div>
     </section>
 
+    <!-- BIO SECTION -->
     <section id="about" class="bio-section">
         <div class="bio-content">
             <div>
@@ -146,15 +154,16 @@
                 <h2 style="font-family: 'Playfair Display'; font-size: 2.5rem; line-height: 1.2;">The Art of <i>Digital</i> Execution.</h2>
             </div>
             <div class="bio-text">
-                <p>I am a <strong>Professional Web Designer and Developer</strong> dedicated to creating e-commerce platforms and brand identities that feel premium. With an English Honours background, I ensure your messaging is as sharp as the visual architecture.</p>
-                <p>As a specialist in <strong>Wix Velo, Shopify, and WordPress</strong>, I deliver pixel-perfect results combined with <strong>Technical SEO</strong> mastery to ensure your brand stays on page one of Google.</p>
-                <a href="https://www.upwork.com/freelancers/~010f9525a841462136" class="btn-main" target="_blank" style="background: var(--gold);">Upwork Success</a>
+                <p>I am a <strong>Freelance Web Designer and Developer</strong> dedicated to creating e-commerce platforms and brand identities that feel premium. With an English Honours background, I ensure your messaging is as sharp as the visual architecture.</p>
+                <p>Specializing in <strong>Wix Velo, Shopify Liquid, and WordPress</strong>, I deliver pixel-perfect results combined with <strong>Technical SEO</strong> dominance to ensure your brand remains visible and scalable on Google.</p>
+                <a href="https://www.upwork.com/freelancers/~010f9525a841462136" class="btn-main" target="_blank" style="background: var(--gold); font-size: 0.8rem;">View Upwork Profile</a>
             </div>
         </div>
     </section>
 
+    <!-- SERVICES SECTION -->
     <section id="services">
-        <span class="section-label" style="text-align: center;">Expertise</span>
+        <span class="section-label" style="text-align: center;">Core Expertise</span>
         <div class="services-grid">
             <div class="service-card">
                 <h3>Custom Wix Dev</h3>
@@ -162,38 +171,47 @@
             </div>
             <div class="service-card">
                 <h3>Shopify Systems</h3>
-                <p>Building high-conversion e-commerce stores with custom Liquid sections and expert SEO.</p>
+                <p>Building high-conversion e-commerce stores with custom Liquid sections and expert marketing flows.</p>
             </div>
             <div class="service-card">
                 <h3>Technical SEO</h3>
-                <p>Fixing indexation, site speed, and technical health to ensure page-one rankings.</p>
+                <p>Fixing indexation, site speed, and technical health to ensure consistent page-one rankings.</p>
             </div>
         </div>
     </section>
 
+    <!-- CONTACT SECTION (AJAX FUNCTIONAL) -->
     <section id="contact">
         <div class="contact-container">
-            <div>
+            <div style="text-align: left;">
                 <span class="section-label">Inquiry</span>
                 <h2 style="font-family: 'Playfair Display'; font-size: 2.8rem; margin-bottom: 20px;">Let's build your vision.</h2>
                 <p style="color: var(--muted);">saifulweb54@gmail.com</p>
+                <!-- SUCCESS/ERROR MESSAGE BOX -->
                 <div id="form-status" style="margin-top: 25px; font-weight: 700; display: none; padding: 15px; border-radius: 4px;"></div>
             </div>
 
-            <form id="my-form" action="https://formspree.io/f/saifulweb54@gmail.com" method="POST">
-                <div class="form-group"><input type="text" name="name" placeholder="Full Name" required></div>
-                <div class="form-group"><input type="email" name="_replyto" placeholder="Email Address" required></div>
-                <div class="form-group"><textarea name="message" rows="5" placeholder="Tell me about your project..." required></textarea></div>
+            <form id="my-form" action="https://formspree.io/f/mpqbazzq" method="POST">
+                <div class="form-group">
+                    <input type="text" name="name" placeholder="Full Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" name="email" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <textarea name="message" rows="5" placeholder="Tell me about your project..." required></textarea>
+                </div>
                 <button id="submit-btn" type="submit" class="btn-main" style="width: 100%;">Send Inquiry</button>
             </form>
         </div>
     </section>
 
+    <!-- PREMIUM FOOTER -->
     <footer class="footer-premium">
         <div class="footer-grid">
             <div class="footer-brand">
                 <div class="logo">SAIFUL<span>.</span></div>
-                <p style="color: #666; font-size: 0.95rem; line-height: 1.8;">Elevating brands through high-performance web development and strategic SEO implementation.</p>
+                <p style="color: #666; font-size: 0.95rem; line-height: 1.8;">Elevating digital brands through premium web architecture and strategic SEO implementation.</p>
             </div>
             <div class="footer-col">
                 <h4>Explore</h4>
@@ -213,22 +231,31 @@
         </div>
         <div class="footer-bottom">
             <div>© 2026 SAIFUL PORTFOLIO. ALL RIGHTS RESERVED.</div>
-            <div>STAY PREMIUM.</div>
+            <div>DEVELOPED WITH PRECISION.</div>
         </div>
     </footer>
 
+    <!-- WHATSAPP FLOAT -->
     <a href="https://wa.me/+8801624998470" class="wa-float" target="_blank">
         <svg viewBox="0 0 32 32"><path d="M16 0c-8.837 0-16 7.163-16 16 0 2.825 0.733 5.476 2.016 7.787l-2.016 7.363 7.544-1.98c2.26 1.22 4.848 1.916 7.59 1.916 8.837 0 16-7.163 16-16s-7.163-16-16-16zm8.39 22.42c-0.347 0.98-1.724 1.785-2.38 1.888-0.655 0.103-1.31 0.173-4.225-0.98-2.915-1.153-4.803-4.116-4.948-4.31-.145-0.193-1.176-1.564-1.176-2.984 0-1.42 0.738-2.12 1.002-2.413 0.262-0.293 0.572-0.366 0.76-0.366s0.375 0.004 0.54 0.012c0.173 0.008 0.406-0.065 0.636 0.488 0.233 0.553 0.793 1.936 0.862 2.074s0.115 0.296 0.022 0.485c-0.092 0.188-0.14 0.306-0.28 0.468s-0.295 0.363-0.422 0.48c-0.14 0.13-0.287 0.272-0.125 0.55 0.163 0.28 0.72 1.185 1.545 1.914 1.06 0.938 1.956 1.23 2.235 1.368s0.442 0.114 0.607-0.077c0.165-0.19 0.71-0.825 0.9-1.11s0.38-0.237 0.64-0.143c0.26 0.095 1.644 0.776 1.927 0.918s0.473 0.237 0.543 0.354c0.068 0.117 0.068 0.682-0.28 1.662z"></path></svg>
     </a>
 
+    <!-- SCRIPTS -->
     <script>
-        // 1. Mobile Menu Logic
+        // 1. Mobile Hamburger Logic
         const menuToggle = document.getElementById('mobile-menu');
         const navMenu = document.querySelector('.nav-menu');
-        menuToggle.onclick = () => navMenu.classList.toggle('active');
-        document.querySelectorAll('.nav-links').forEach(n => n.onclick = () => navMenu.classList.remove('active'));
+        
+        menuToggle.onclick = () => {
+            navMenu.classList.toggle('active');
+        };
 
-        // 2. AJAX Contact Form Logic
+        // Close menu when a link is clicked
+        document.querySelectorAll('.nav-links').forEach(link => {
+            link.onclick = () => navMenu.classList.remove('active');
+        });
+
+        // 2. AJAX Contact Form Logic (Functional)
         const form = document.getElementById("my-form");
         const status = document.getElementById("form-status");
         const btn = document.getElementById("submit-btn");
@@ -239,33 +266,43 @@
             btn.disabled = true;
             
             const data = new FormData(event.target);
+            
             fetch(event.target.action, {
                 method: form.method,
                 body: data,
                 headers: { 'Accept': 'application/json' }
             }).then(response => {
                 if (response.ok) {
-                    status.innerHTML = "Success! I will contact you shortly.";
+                    status.innerHTML = "Success! Your message has been sent.";
                     status.style.display = "block";
                     status.style.background = "#f0fdf4";
                     status.style.color = "#166534";
                     form.reset();
                     btn.style.display = "none";
                 } else {
-                    status.innerHTML = "Error: Please confirm your email setup with Formspree.";
-                    status.style.display = "block";
-                    status.style.background = "#fef2f2";
-                    status.style.color = "#991b1b";
-                    btn.disabled = false;
-                    btn.innerHTML = "Send Inquiry";
+                    response.json().then(data => {
+                        if (Object.hasOwn(data, 'errors')) {
+                            status.innerHTML = data["errors"].map(error => error["message"]).join(", ");
+                        } else {
+                            status.innerHTML = "Oops! There was a problem submitting your form.";
+                        }
+                        status.style.display = "block";
+                        status.style.background = "#fef2f2";
+                        status.style.color = "#991b1b";
+                        btn.disabled = false;
+                        btn.innerHTML = "Send Inquiry";
+                    })
                 }
             }).catch(error => {
-                status.innerHTML = "Communication error. Check your connection.";
+                status.innerHTML = "Communication error. Please try again.";
                 status.style.display = "block";
+                status.style.background = "#fffbeb";
+                status.style.color = "#92400e";
                 btn.disabled = false;
                 btn.innerHTML = "Send Inquiry";
             });
         }
+        
         form.addEventListener("submit", handleSubmit);
     </script>
 </body>
