@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-  <title>TGC Enterprise Portal - Admin & Employee Sync</title>
+  <title>TGC - Enterprise Management System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; }
+    body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
     .nav-active { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-left: 4px solid #3b82f6; }
     .status-active { background: #d1fae5; color: #065f46; }
     .status-restricted { background: #fee2e2; color: #991b1b; }
     .status-pending { background: #fef3c7; color: #92400e; }
-    .animate-in { animation: fadeIn 0.3s ease-out; }
+    .status-approved { background: #d1fae5; color: #065f46; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+    .animate-fade { animation: fadeIn 0.3s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
@@ -21,23 +23,23 @@
 
   <div id="authSection" class="min-h-screen flex items-center justify-center bg-[#0F172A] p-6">
     <div class="bg-white w-full max-w-md rounded-3xl p-10 shadow-2xl">
-      <div class="text-center mb-10">
-        <h1 class="text-4xl font-extrabold text-[#0F172A] tracking-tight">TGC <span class="text-blue-600">PRO</span></h1>
-        <p id="authSubtitle" class="text-slate-500 mt-2 font-medium">Enterprise Resource Management</p>
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-extrabold text-[#0F172A]">TGC <span class="text-blue-600">PRO</span></h1>
+        <p id="authSubtitle" class="text-slate-500 mt-2 font-medium">Enterprise Management Solution</p>
       </div>
 
       <div id="authError" class="hidden mb-6 bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold border border-red-100 text-center"></div>
 
-      <form id="registerForm" class="space-y-5">
+      <form id="registerForm" class="space-y-4">
         <div class="grid grid-cols-2 gap-4">
-            <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Full Name</label>
-                <input type="text" id="regName" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe" required>
-            </div>
-            <div>
-                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Position</label>
-                <input type="text" id="regPos" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Developer" required>
-            </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Full Name</label>
+            <input type="text" id="regName" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe" required>
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Position</label>
+            <input type="text" id="regPos" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Developer" required>
+          </div>
         </div>
         <div>
           <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Work Email</label>
@@ -47,11 +49,11 @@
           <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Password</label>
           <input type="password" id="regPass" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••" required>
         </div>
-        <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">Create Account</button>
+        <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-100">Create Account</button>
         <p class="text-center text-sm font-medium mt-6">Already on the team? <button type="button" onclick="toggleAuth(false)" class="text-blue-600 font-bold">Sign In</button></p>
       </form>
 
-      <form id="loginForm" class="space-y-5 hidden">
+      <form id="loginForm" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Email Address</label>
           <input type="email" id="loginEmail" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" required>
@@ -60,7 +62,7 @@
           <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Password</label>
           <input type="password" id="loginPass" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" required>
         </div>
-        <button type="submit" class="w-full bg-[#0F172A] text-white p-4 rounded-xl font-bold hover:bg-slate-800 transition">Access Portal</button>
+        <button type="submit" class="w-full bg-[#0F172A] text-white p-4 rounded-xl font-bold hover:bg-slate-800 transition shadow-xl">Access Portal</button>
         <p class="text-center text-sm font-medium mt-6">New employee? <button type="button" onclick="toggleAuth(true)" class="text-blue-600 font-bold">Register</button></p>
       </form>
     </div>
@@ -72,54 +74,56 @@
       
       <nav class="flex-1 px-4 space-y-2">
         <div onclick="showTab('dashboard')" id="nav-dashboard" class="nav-active p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold transition-all"><i data-lucide="layout-grid" class="w-5"></i> Dashboard</div>
-        <div onclick="showTab('timesheet')" id="nav-timesheet" class="p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold hover:bg-white/5 hover:text-white transition-all"><i data-lucide="activity" class="w-5"></i> My Activity</div>
+        <div onclick="showTab('timesheet')" id="nav-timesheet" class="p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold hover:bg-white/5 hover:text-white transition-all"><i data-lucide="clock" class="w-5"></i> My Activity</div>
         
         <div id="adminMenu" class="hidden pt-8">
-            <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Administration</p>
-            <div onclick="showTab('manage-employees')" id="nav-manage" class="p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold hover:bg-white/5 hover:text-white transition-all"><i data-lucide="users" class="w-5"></i> Team Directory</div>
-            <div onclick="showTab('approvals')" id="nav-approvals" class="p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold hover:bg-white/5 hover:text-white transition-all"><i data-lucide="file-check" class="w-5"></i> Time Approvals</div>
+          <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Administration</p>
+          <div onclick="showTab('manage')" id="nav-manage" class="p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold hover:bg-white/5 hover:text-white transition-all"><i data-lucide="users" class="w-5"></i> Team Directory</div>
+          <div onclick="showTab('approvals')" id="nav-approvals" class="p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold hover:bg-white/5 hover:text-white transition-all"><i data-lucide="check-square" class="w-5"></i> Verification</div>
         </div>
       </nav>
 
       <div class="p-8 bg-black/20">
         <div class="flex items-center gap-3 mb-6">
-            <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold" id="userInitial">U</div>
-            <div>
-                <p id="userName" class="text-sm font-bold text-white truncate w-32"></p>
-                <p id="userRole" class="text-[10px] uppercase font-black text-slate-500"></p>
-            </div>
+          <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold" id="userInitial">U</div>
+          <div>
+            <p id="userName" class="text-sm font-bold text-white truncate w-32"></p>
+            <p id="userPos" class="text-[10px] uppercase font-black text-slate-500"></p>
+          </div>
         </div>
-        <button onclick="logout()" class="w-full flex items-center justify-center gap-2 text-xs font-bold text-red-400 hover:text-red-300 transition"><i data-lucide="power" class="w-4"></i> DISCONNECT</button>
+        <button onclick="logout()" class="w-full flex items-center justify-center gap-2 text-xs font-bold text-red-400 hover:text-red-300 transition"><i data-lucide="power" class="w-4"></i> LOGOUT</button>
       </div>
     </aside>
 
     <main class="flex-1 ml-72 p-12">
-      <div class="flex justify-between items-end mb-12">
+      <header class="flex justify-between items-end mb-12">
         <div>
-            <h2 id="viewTitle" class="text-4xl font-black text-[#0F172A]">Overview</h2>
-            <p id="viewSubtitle" class="text-slate-500 mt-2 font-medium">Real-time statistics and activity data.</p>
+          <h2 id="viewTitle" class="text-4xl font-black text-[#0F172A]">Overview</h2>
+          <p id="viewSubtitle" class="text-slate-500 mt-2">Real-time enterprise metrics.</p>
         </div>
-        <button id="addTimeBtn" onclick="openModal()" class="hidden bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold shadow-xl shadow-blue-100 hover:scale-105 transition flex items-center gap-2"><i data-lucide="plus"></i> New Slot</button>
+        <button id="addTimeBtn" onclick="openModal()" class="hidden bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold shadow-xl hover:scale-105 transition flex items-center gap-2 animate-fade">
+          <i data-lucide="plus"></i> New Time Slot
+        </button>
+      </header>
+
+      <div id="dashboardView" class="grid grid-cols-1 md:grid-cols-3 gap-8 animate-fade">
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+          <p class="text-slate-400 text-xs font-black uppercase">Your Total Hours</p>
+          <h3 id="statHours" class="text-5xl font-black mt-2 text-[#0F172A]">0</h3>
+        </div>
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+          <p class="text-slate-400 text-xs font-black uppercase">Total Logs</p>
+          <h3 id="statEntries" class="text-5xl font-black mt-2 text-blue-600">0</h3>
+        </div>
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+          <p class="text-slate-400 text-xs font-black uppercase">Work Status</p>
+          <h3 id="statStatus" class="text-3xl font-black mt-2 text-green-500 tracking-tighter">OPERATIONAL</h3>
+        </div>
       </div>
 
-      <div id="dashboardView" class="grid grid-cols-1 md:grid-cols-3 gap-8 animate-in">
-        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-            <p class="text-slate-400 text-xs font-black uppercase tracking-widest">Logged Hours</p>
-            <h3 id="statHours" class="text-5xl font-black mt-2 text-[#0F172A]">0</h3>
-        </div>
-        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-            <p class="text-slate-400 text-xs font-black uppercase tracking-widest">Active Entries</p>
-            <h3 id="statEntries" class="text-5xl font-black mt-2 text-blue-600">0</h3>
-        </div>
-        <div id="statusCard" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-            <p class="text-slate-400 text-xs font-black uppercase tracking-widest">Account Integrity</p>
-            <h3 id="statStatus" class="text-5xl font-black mt-2 text-green-500">CLEAR</h3>
-        </div>
-      </div>
-
-      <div id="listView" class="hidden bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden animate-in">
+      <div id="listView" class="hidden bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden animate-fade">
         <table class="w-full text-left">
-          <thead class="bg-slate-50/50 border-b border-slate-100">
+          <thead class="bg-slate-50 border-b">
             <tr id="tableHead" class="text-[11px] font-black uppercase text-slate-400 tracking-widest"></tr>
           </thead>
           <tbody id="tableBody" class="text-sm font-medium"></tbody>
@@ -129,56 +133,57 @@
   </div>
 
   <div id="modal" class="fixed inset-0 bg-[#0F172A]/90 hidden flex items-center justify-center p-6 z-50 backdrop-blur-md">
-    <div class="bg-white w-full max-w-lg rounded-3xl p-10 shadow-2xl">
-      <h3 class="text-3xl font-black mb-8 text-[#0F172A]">Log Work Session</h3>
+    <div class="bg-white w-full max-w-md rounded-3xl p-10 shadow-2xl">
+      <h3 class="text-3xl font-black mb-8 text-[#0F172A]">Log New Slot</h3>
       <form id="tsForm" class="space-y-6">
-        <div class="grid grid-cols-2 gap-6">
-            <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Work Date</label>
-                <input type="date" id="tsDate" class="w-full p-4 border rounded-2xl outline-none" required>
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Hours</label>
-                <input type="number" id="tsHours" class="w-full p-4 border rounded-2xl outline-none" min="1" max="24" required>
-            </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Work Date</label>
+            <input type="date" id="tsDate" class="w-full p-4 border rounded-2xl outline-none" required>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Hours</label>
+            <input type="number" id="tsHours" class="w-full p-4 border rounded-2xl outline-none" min="1" max="24" required>
+          </div>
         </div>
         <div>
-            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Description of Activity</label>
-            <textarea id="tsDesc" class="w-full p-4 border rounded-2xl outline-none" rows="4" placeholder="Briefly describe your tasks..." required></textarea>
+          <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Work Description</label>
+          <textarea id="tsDesc" class="w-full p-4 border rounded-2xl outline-none" rows="3" placeholder="What did you complete?" required></textarea>
         </div>
         <div class="flex gap-4 pt-4">
-          <button type="button" onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400">Dismiss</button>
-          <button type="submit" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-100">Submit Log</button>
+          <button type="button" onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400">Cancel</button>
+          <button type="submit" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg">Submit Slot</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    // --- DATABASE (Persistence) ---
+    // --- DATABASE ENGINE ---
     let currentUser = null;
-    let users = JSON.parse(localStorage.getItem('tgc_sys_users')) || [
-        { name: "Global Administrator", email: "admin@tgc.com", pass: "admin123", role: "admin", pos: "Director", status: "active" }
+    let users = JSON.parse(localStorage.getItem('tgc_full_users')) || [
+        { name: "Global Admin", email: "admin@tgc.com", pass: "admin123", role: "admin", pos: "Director", status: "active" }
     ];
-    let entries = JSON.parse(localStorage.getItem('tgc_sys_entries')) || [];
+    let entries = JSON.parse(localStorage.getItem('tgc_full_entries')) || [];
 
-    const sync = () => {
-        localStorage.setItem('tgc_sys_users', JSON.stringify(users));
-        localStorage.setItem('tgc_sys_entries', JSON.stringify(entries));
+    const syncDB = () => {
+        localStorage.setItem('tgc_full_users', JSON.stringify(users));
+        localStorage.setItem('tgc_full_entries', JSON.stringify(entries));
     };
 
-    // --- AUTH ---
+    // --- AUTH FLOW ---
     function toggleAuth(isReg) {
         document.getElementById('registerForm').classList.toggle('hidden', !isReg);
         document.getElementById('loginForm').classList.toggle('hidden', isReg);
         document.getElementById('authError').classList.add('hidden');
+        document.getElementById('authSubtitle').innerText = isReg ? "Create Employee Account" : "Access Workspace Portal";
     }
 
     document.getElementById('registerForm').onsubmit = (e) => {
         e.preventDefault();
         const email = document.getElementById('regEmail').value.trim().toLowerCase();
         if(users.find(u => u.email === email)) {
-            showAuthErr("This email is already registered to an employee.");
+            showAuthErr("CRITICAL: This email is already registered to a user.");
             return;
         }
         users.push({
@@ -189,8 +194,8 @@
             role: 'employee',
             status: 'active'
         });
-        sync();
-        alert("Registration complete. You can now login.");
+        syncDB();
+        alert("Registration Successful. Please Login.");
         toggleAuth(false);
     };
 
@@ -200,25 +205,24 @@
         const pass = document.getElementById('loginPass').value;
         const u = users.find(x => x.email === email && x.pass === pass);
         
-        if(!u) return showAuthErr("Invalid credentials. Try again.");
-        if(u.status === 'restricted') return showAuthErr("ACCOUNT SUSPENDED: Contact Admin.");
+        if(!u) return showAuthErr("Error: Invalid email or password.");
+        if(u.status === 'restricted') return showAuthErr("ACCESS DENIED: Account restricted by admin.");
         
         currentUser = u;
-        init();
+        initApp();
     };
 
-    function showAuthErr(msg) {
-        const box = document.getElementById('authError');
-        box.innerText = msg;
-        box.classList.remove('hidden');
-    }
+    const showAuthErr = (m) => {
+        const b = document.getElementById('authError');
+        b.innerText = m; b.classList.remove('hidden');
+    };
 
-    // --- APP INITIALIZATION ---
-    function init() {
+    // --- APP UI ---
+    function initApp() {
         document.getElementById('authSection').classList.add('hidden');
         document.getElementById('mainApp').classList.remove('hidden');
         document.getElementById('userName').innerText = currentUser.name;
-        document.getElementById('userRole').innerText = currentUser.role;
+        document.getElementById('userPos').innerText = currentUser.pos;
         document.getElementById('userInitial').innerText = currentUser.name.charAt(0);
         if(currentUser.role === 'admin') document.getElementById('adminMenu').classList.remove('hidden');
         lucide.createIcons();
@@ -231,25 +235,25 @@
         document.getElementById('addTimeBtn').classList.add('hidden');
         
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-        const navId = tab === 'manage-employees' ? 'nav-manage' : `nav-${tab}`;
+        const navId = tab === 'manage' ? 'nav-manage' : `nav-${tab}`;
         document.getElementById(navId)?.classList.add('nav-active');
 
         if(tab === 'dashboard') {
             document.getElementById('dashboardView').classList.remove('hidden');
-            document.getElementById('viewTitle').innerText = "System Overview";
+            document.getElementById('viewTitle').innerText = "Overview";
             updateStats();
         } else if (tab === 'timesheet') {
             document.getElementById('listView').classList.remove('hidden');
             document.getElementById('addTimeBtn').classList.remove('hidden');
-            document.getElementById('viewTitle').innerText = "My Activity Log";
-            renderEmpTable();
-        } else if (tab === 'manage-employees') {
+            document.getElementById('viewTitle').innerText = "Activity History";
+            renderUserLogs();
+        } else if (tab === 'manage') {
             document.getElementById('listView').classList.remove('hidden');
-            document.getElementById('viewTitle').innerText = "Team Directory";
-            renderAdminUserTable();
+            document.getElementById('viewTitle').innerText = "Team Management";
+            renderAdminUserList();
         } else if (tab === 'approvals') {
             document.getElementById('listView').classList.remove('hidden');
-            document.getElementById('viewTitle').innerText = "Time Verification";
+            document.getElementById('viewTitle').innerText = "Pending Approvals";
             renderApprovals();
         }
     }
@@ -260,8 +264,91 @@
         document.getElementById('statEntries').innerText = myEntries.length;
     }
 
-    // --- TABLE RENDERING ---
-    function renderEmpTable() {
-        document.getElementById('tableHead').innerHTML = `<th class="p-6">Date</th><th class="p-6">Description</th><th class="p-6 text-center">Hours</th><th class="p-6">Status</th>`;
+    // --- DATA RENDERING ---
+    function renderUserLogs() {
+        document.getElementById('tableHead').innerHTML = `<th class="p-6">Date</th><th class="p-6">Task Description</th><th class="p-6 text-center">Hours</th><th class="p-6">Status</th>`;
         const myEntries = entries.filter(e => e.email === currentUser.email);
-        document.getElementById('tableBody').innerHTML
+        document.getElementById('tableBody').innerHTML = myEntries.reverse().map(e => `
+            <tr class="border-b hover:bg-slate-50 transition">
+                <td class="p-6 font-bold text-slate-700">${e.date}</td>
+                <td class="p-6 text-slate-500">${e.desc}</td>
+                <td class="p-6 text-center font-black">${e.hours}h</td>
+                <td class="p-6"><span class="status-${e.status} px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest">${e.status}</span></td>
+            </tr>
+        `).join('') || `<tr><td colspan="4" class="p-16 text-center text-slate-400 font-bold">No hours logged yet.</td></tr>`;
+    }
+
+    function renderAdminUserList() {
+        document.getElementById('tableHead').innerHTML = `<th class="p-6">Staff Member</th><th class="p-6 text-center">Total Hours</th><th class="p-6 text-center">Privileges</th>`;
+        document.getElementById('tableBody').innerHTML = users.filter(u => u.role !== 'admin').map(u => {
+            const hrs = entries.filter(e => e.email === u.email).reduce((a,b) => a + Number(b.hours), 0);
+            return `
+                <tr class="border-b hover:bg-slate-50 transition">
+                    <td class="p-6">
+                        <div class="font-bold text-[#0F172A]">${u.name}</div>
+                        <div class="text-[10px] font-black text-blue-500 uppercase">${u.pos}</div>
+                    </td>
+                    <td class="p-6 text-center font-black text-xl text-blue-600">${hrs}h</td>
+                    <td class="p-6 text-center">
+                        <button onclick="toggleUserStatus('${u.email}')" class="px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${u.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-600 text-white'} shadow-sm">
+                            ${u.status === 'active' ? '● AUTHORIZED' : '■ RESTRICTED'}
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderApprovals() {
+        document.getElementById('tableHead').innerHTML = `<th class="p-6">Employee</th><th class="p-6">Date</th><th class="p-6">Hours</th><th class="p-6 text-right">Actions</th>`;
+        const pending = entries.filter(e => e.status === 'pending');
+        document.getElementById('tableBody').innerHTML = pending.map(e => `
+            <tr class="border-b">
+                <td class="p-6 font-bold text-blue-950">${e.name}</td>
+                <td class="p-6 text-slate-500">${e.date}</td>
+                <td class="p-6 font-black">${e.hours}h</td>
+                <td class="p-6 text-right space-x-2">
+                    <button onclick="updateEntry('${e.id}', 'approved')" class="bg-blue-600 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase shadow-lg">Verify</button>
+                    <button onclick="updateEntry('${e.id}', 'rejected')" class="bg-red-50 text-red-600 px-5 py-2 rounded-xl text-[10px] font-black uppercase border border-red-100">Void</button>
+                </td>
+            </tr>
+        `).join('') || `<tr><td colspan="4" class="p-16 text-center text-slate-400 font-bold uppercase tracking-widest">Everything Verified!</td></tr>`;
+    }
+
+    // --- FUNCTIONAL ACTIONS ---
+    function toggleUserStatus(email) {
+        const u = users.find(x => x.email === email);
+        u.status = (u.status === 'active') ? 'restricted' : 'active';
+        syncDB();
+        renderAdminUserList();
+    }
+
+    function updateEntry(id, stat) {
+        const idx = entries.findIndex(e => e.id === id);
+        entries[idx].status = stat;
+        syncDB();
+        renderApprovals();
+    }
+
+    document.getElementById('tsForm').onsubmit = (e) => {
+        e.preventDefault();
+        entries.push({
+            id: Date.now().toString(),
+            email: currentUser.email,
+            name: currentUser.name,
+            date: document.getElementById('tsDate').value,
+            hours: document.getElementById('tsHours').value,
+            desc: document.getElementById('tsDesc').value,
+            status: 'pending'
+        });
+        syncDB();
+        closeModal();
+        showTab('timesheet');
+    };
+
+    const openModal = () => document.getElementById('modal').classList.remove('hidden');
+    const closeModal = () => document.getElementById('modal').classList.add('hidden');
+    const logout = () => location.reload();
+  </script>
+</body>
+</html>
