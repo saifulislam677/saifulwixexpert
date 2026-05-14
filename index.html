@@ -3,339 +3,321 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-  <title>TGC Global Management</title>
+  <title>TGC Enterprise | Employee Management</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); }
-    .nav-active { background: #1E3A8A; color: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2); }
-    .sidebar-gradient { background: linear-gradient(180deg, #05162B 0%, #0B213F 100%); }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
+    .sidebar-navy { background: #05162B; }
+    .nav-item-active { background: rgba(59, 130, 246, 0.15); color: #60A5FA; border-left: 4px solid #3B82F6; }
+    .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid #E2E8F0; }
+    .badge-pending { background: #FEF3C7; color: #92400E; }
+    .badge-approved { background: #DCFCE7; color: #166534; }
+    .badge-rejected { background: #FEE2E2; color: #991B1B; }
     
-    /* Responsive Table Styles */
-    @media (max-width: 768px) {
-      .responsive-table thead { display: none; }
-      .responsive-table tr { display: block; margin-bottom: 1rem; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px; background: white; }
-      .responsive-table td { display: flex; justify-content: space-between; padding: 8px 5px; border: none; font-size: 13px; }
-      .responsive-table td::before { content: attr(data-label); font-weight: 700; color: #64748B; }
-      .sidebar-fixed { transform: translateX(-100%); transition: transform 0.3s ease; }
+    @media (max-width: 1024px) {
+      .sidebar-mobile { transform: translateX(-100%); transition: 0.3s ease; }
       .sidebar-open { transform: translateX(0); }
     }
   </style>
 </head>
-<body class="bg-[#F1F5F9] text-[#0F172A]">
+<body class="text-[#0F172A]">
 
-  <header class="lg:hidden flex items-center justify-between p-4 bg-[#05162B] text-white sticky top-0 z-50">
-    <div class="text-xl font-black italic">TGC</div>
-    <button onclick="toggleSidebar()" class="p-2 bg-white/10 rounded-lg"><i data-lucide="menu"></i></button>
-  </header>
-
-  <div id="authSection" class="min-h-screen flex items-center justify-center p-6 bg-[#05162B]">
-    <div class="bg-white w-full max-w-md rounded-[2rem] p-10 shadow-2xl animate-fade">
-      <div class="text-center mb-10">
-        <div class="inline-block p-4 bg-blue-50 rounded-2xl mb-4"><i data-lucide="shield-check" class="text-blue-600 w-8 h-8"></i></div>
-        <h1 class="text-3xl font-extrabold text-[#05162B]">Welcome Back</h1>
-        <p id="authSubtitle" class="text-slate-400 mt-2 font-medium">Please enter your credentials</p>
+  <div id="authLayer" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#05162B] p-4">
+    <div class="bg-white w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl">
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-black tracking-tighter text-[#05162B]">TGC <span class="text-blue-600">PRO</span></h1>
+        <p id="authSubtitle" class="text-slate-400 font-medium text-sm mt-1">Management Portal v2.0</p>
       </div>
 
-      <div id="authError" class="hidden mb-6 bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold border border-red-100 text-center"></div>
+      <div id="authMsg" class="hidden mb-6 p-4 rounded-2xl text-xs font-bold text-center border"></div>
 
-      <form id="registerForm" class="space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-          <input type="text" id="regName" class="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Full Name" required>
-          <input type="text" id="regPos" class="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Position" required>
-        </div>
-        <input type="email" id="regEmail" class="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Email Address" required>
-        <input type="password" id="regPass" class="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password" required>
-        <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-2xl font-bold shadow-lg hover:bg-blue-700 transition">Create Account</button>
-        <p class="text-center text-sm font-medium mt-6 text-slate-500">Member already? <button type="button" onclick="toggleAuth(false)" class="text-blue-600 font-bold">Login</button></p>
+      <form id="loginForm" class="space-y-4">
+        <input type="email" id="lEmail" class="w-full p-4 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Email" required>
+        <input type="password" id="lPass" class="w-full p-4 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500 transition" placeholder="Password" required>
+        <button type="submit" class="w-full bg-[#05162B] text-white py-4 rounded-2xl font-bold shadow-xl hover:opacity-90 transition">Login</button>
+        <p class="text-center text-sm mt-6 text-slate-500">New employee? <button type="button" onclick="swapAuth(true)" class="text-blue-600 font-bold">Register</button></p>
       </form>
 
-      <form id="loginForm" class="space-y-4 hidden">
-        <input type="email" id="loginEmail" class="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Email" required>
-        <input type="password" id="loginPass" class="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Password" required>
-        <button type="submit" class="w-full bg-[#05162B] text-white p-4 rounded-2xl font-bold hover:opacity-90 transition shadow-xl">Sign In</button>
-        <p class="text-center text-sm font-medium mt-6 text-slate-500">New employee? <button type="button" onclick="toggleAuth(true)" class="text-blue-600 font-bold">Register Now</button></p>
+      <form id="regForm" class="space-y-4 hidden">
+        <div class="grid grid-cols-2 gap-3">
+          <input type="text" id="rName" class="p-4 bg-slate-50 rounded-2xl outline-none" placeholder="Name" required>
+          <input type="text" id="rPos" class="p-4 bg-slate-50 rounded-2xl outline-none" placeholder="Position" required>
+        </div>
+        <input type="email" id="rEmail" class="w-full p-4 bg-slate-50 rounded-2xl outline-none" placeholder="Email" required>
+        <input type="password" id="rPass" class="w-full p-4 bg-slate-50 rounded-2xl outline-none" placeholder="Password" required>
+        <button type="submit" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold">Register Employee</button>
+        <p class="text-center text-sm mt-6 text-slate-500">Already a member? <button type="button" onclick="swapAuth(false)" class="text-blue-600 font-bold">Login</button></p>
       </form>
     </div>
   </div>
 
-  <div id="mainApp" class="hidden flex min-h-screen overflow-hidden">
-    <aside id="sidebar" class="sidebar-fixed lg:transform-none lg:relative w-72 sidebar-gradient text-slate-400 flex flex-col fixed h-full z-50">
-      <div class="p-8 text-white text-2xl font-black tracking-tighter flex justify-between items-center">
-        TGC <span class="text-blue-500 text-sm font-light">SYSTEMS</span>
-        <button onclick="toggleSidebar()" class="lg:hidden text-slate-400"><i data-lucide="x"></i></button>
+  <div id="mainApp" class="hidden flex min-h-screen">
+    <aside id="sidebar" class="sidebar-mobile lg:translate-x-0 fixed lg:relative w-72 h-full sidebar-navy z-50 flex flex-col">
+      <div class="p-8 flex items-center justify-between">
+        <span class="text-white text-2xl font-black italic">TGC</span>
+        <button onclick="toggleSide()" class="lg:hidden text-white"><i data-lucide="x"></i></button>
       </div>
-      
-      <nav class="flex-1 px-4 space-y-2 mt-4">
-        <div onclick="showTab('dashboard')" id="nav-dashboard" class="nav-active p-4 flex items-center gap-4 cursor-pointer font-semibold transition-all"><i data-lucide="layout-dashboard"></i> Dashboard</div>
-        <div onclick="showTab('timesheet')" id="nav-timesheet" class="p-4 flex items-center gap-4 cursor-pointer font-semibold hover:text-white transition-all"><i data-lucide="clock-3"></i> My Timesheet</div>
+
+      <nav class="flex-1 px-4 space-y-2">
+        <div onclick="tab('dash')" id="m-dash" class="nav-item-active p-4 flex items-center gap-4 cursor-pointer font-bold transition-all"><i data-lucide="layout-grid"></i> Dashboard</div>
+        <div onclick="tab('logs')" id="m-logs" class="p-4 flex items-center gap-4 cursor-pointer font-bold text-slate-400 hover:text-white transition-all"><i data-lucide="activity"></i> My Activity</div>
         
-        <div id="adminMenu" class="hidden pt-10">
-          <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Admin Controls</p>
-          <div onclick="showTab('manage')" id="nav-manage" class="p-4 flex items-center gap-4 cursor-pointer font-semibold hover:text-white transition-all"><i data-lucide="users-round"></i> Team Directory</div>
-          <div onclick="showTab('approvals')" id="nav-approvals" class="p-4 flex items-center gap-4 cursor-pointer font-semibold hover:text-white transition-all"><i data-lucide="shield-check"></i> Verifications</div>
+        <div id="adminPanel" class="hidden pt-10">
+          <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Admin Suite</p>
+          <div onclick="tab('directory')" id="m-directory" class="p-4 flex items-center gap-4 cursor-pointer font-bold text-slate-400 hover:text-white transition-all"><i data-lucide="users"></i> Directory</div>
+          <div onclick="tab('verify')" id="m-verify" class="p-4 flex items-center gap-4 cursor-pointer font-bold text-slate-400 hover:text-white transition-all"><i data-lucide="clipboard-check"></i> Verifications</div>
         </div>
       </nav>
 
-      <div class="p-6 m-4 rounded-3xl bg-white/5 border border-white/10">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-lg" id="userInitial">?</div>
+      <div class="p-6 m-4 bg-white/5 rounded-3xl">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold" id="uInit"></div>
           <div class="overflow-hidden">
-            <p id="userName" class="text-sm font-bold text-white truncate"></p>
-            <p id="userPos" class="text-[10px] uppercase font-black text-blue-400"></p>
+            <p id="uName" class="text-sm font-bold text-white truncate"></p>
+            <p id="uPos" class="text-[10px] text-blue-400 font-bold uppercase"></p>
           </div>
         </div>
-        <button onclick="logout()" class="w-full flex items-center justify-center gap-2 text-xs font-bold text-red-400 hover:bg-red-500/10 p-2 rounded-xl transition"><i data-lucide="log-out" class="w-4"></i> DISCONNECT</button>
+        <button onclick="logout()" class="w-full py-3 bg-red-500/10 text-red-500 rounded-xl text-xs font-black hover:bg-red-500/20 transition">LOGOUT</button>
       </div>
     </aside>
 
-    <main class="flex-1 lg:ml-0 h-screen overflow-y-auto p-4 lg:p-12">
-      <header class="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-4 mb-10">
+    <main class="flex-1 h-screen overflow-y-auto p-6 lg:p-12">
+      <header class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4 mb-12">
         <div>
-          <h2 id="viewTitle" class="text-3xl lg:text-4xl font-black text-[#05162B]">Dashboard</h2>
-          <p id="viewSubtitle" class="text-slate-500 mt-1 font-medium">Monitoring your performance and logs.</p>
+          <h2 id="viewT" class="text-4xl font-black text-[#05162B]">Dashboard</h2>
+          <p id="viewS" class="text-slate-400 font-medium">Welcome back to your workstation.</p>
         </div>
-        <button id="addTimeBtn" onclick="openModal()" class="hidden bg-blue-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-xl shadow-blue-200 hover:scale-105 active:scale-95 transition flex items-center justify-center gap-2">
-          <i data-lucide="plus-circle" class="w-5"></i> Log Time
+        <button id="addBtn" onclick="openM()" class="hidden bg-blue-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-xl shadow-blue-100 hover:scale-105 transition flex items-center gap-2">
+          <i data-lucide="plus"></i> New Task Log
         </button>
       </header>
 
-      <div id="dashboardView" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-        <div class="glass-card p-8 rounded-[2rem] shadow-sm">
-          <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 text-blue-600"><i data-lucide="hourglass"></i></div>
-          <p class="text-slate-400 text-xs font-black uppercase tracking-widest">Total Hours</p>
-          <h3 id="statHours" class="text-4xl font-black mt-2">0</h3>
+      <div id="dashView" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="glass p-8 rounded-[2.5rem] shadow-sm">
+          <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="clock"></i></div>
+          <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Logged Hours</p>
+          <h3 id="sHours" class="text-5xl font-black mt-1">0</h3>
         </div>
-        <div class="glass-card p-8 rounded-[2rem] shadow-sm">
-          <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 text-indigo-600"><i data-lucide="file-text"></i></div>
-          <p class="text-slate-400 text-xs font-black uppercase tracking-widest">Total Logs</p>
-          <h3 id="statEntries" class="text-4xl font-black mt-2">0</h3>
+        <div class="glass p-8 rounded-[2.5rem] shadow-sm">
+          <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="check-square"></i></div>
+          <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Tasks Approved</p>
+          <h3 id="sTasks" class="text-5xl font-black mt-1 text-blue-600">0</h3>
         </div>
-        <div class="glass-card p-8 rounded-[2rem] shadow-sm">
-          <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center mb-6 text-green-600"><i data-lucide="check-circle-2"></i></div>
-          <p class="text-slate-400 text-xs font-black uppercase tracking-widest">Account Status</p>
-          <h3 id="statStatus" class="text-2xl font-black mt-2 text-green-600 uppercase italic">Active</h3>
+        <div class="glass p-8 rounded-[2.5rem] shadow-sm">
+          <div class="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="shield-check"></i></div>
+          <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">System Status</p>
+          <h3 class="text-3xl font-black mt-1 text-green-500 italic">SYNCED</h3>
         </div>
       </div>
 
-      <div id="listView" class="hidden glass-card rounded-[2rem] shadow-sm overflow-hidden">
-        <table class="w-full text-left responsive-table">
+      <div id="tableView" class="hidden glass rounded-[2.5rem] overflow-hidden mt-8">
+        <table class="w-full text-left">
           <thead class="bg-slate-50 border-b border-slate-100">
-            <tr id="tableHead" class="text-[11px] font-black uppercase text-slate-400 tracking-widest"></tr>
+            <tr id="tHead" class="text-[10px] font-black uppercase text-slate-400 tracking-widest"></tr>
           </thead>
-          <tbody id="tableBody" class="divide-y divide-slate-50"></tbody>
+          <tbody id="tBody" class="text-sm font-medium"></tbody>
         </table>
       </div>
     </main>
   </div>
 
-  <div id="modal" class="fixed inset-0 bg-[#05162B]/80 hidden flex items-center justify-center p-6 z-[60] backdrop-blur-sm">
-    <div class="bg-white w-full max-w-lg rounded-[2.5rem] p-10 shadow-2xl animate-fade">
-      <h3 class="text-2xl font-black mb-8 text-[#05162B]">Log New Work Slot</h3>
-      <form id="tsForm" class="space-y-6">
+  <div id="modal" class="fixed inset-0 z-[200] bg-black/60 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-md rounded-[3rem] p-10 shadow-2xl">
+      <h3 class="text-3xl font-black mb-8">Log Activity</h3>
+      <form id="taskForm" class="space-y-6">
         <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Date</label>
-            <input type="date" id="tsDate" class="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none" required>
-          </div>
-          <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Hours</label>
-            <input type="number" id="tsHours" class="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none" min="1" max="24" required>
-          </div>
+          <input type="date" id="tDate" class="p-4 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600" required>
+          <input type="number" id="tHrs" class="p-4 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600" placeholder="Hours" min="1" max="24" required>
         </div>
-        <div>
-          <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Task Description</label>
-          <textarea id="tsDesc" class="w-full p-4 bg-slate-50 border-0 rounded-2xl outline-none" rows="3" placeholder="What did you work on today?" required></textarea>
-        </div>
-        <div class="flex gap-4 pt-4">
-          <button type="button" onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400 hover:text-slate-600 transition">Cancel</button>
-          <button type="submit" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-100 hover:bg-blue-700 transition">Save Entry</button>
+        <textarea id="tDesc" class="w-full p-4 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600" rows="3" placeholder="Describe your tasks..." required></textarea>
+        <div class="flex gap-4">
+          <button type="button" onclick="closeM()" class="flex-1 font-bold text-slate-400">Cancel</button>
+          <button type="submit" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-100">Save Task</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    // --- APP DATABASE ENGINE ---
-    let currentUser = null;
-    let users = JSON.parse(localStorage.getItem('tgc_v3_users')) || [
-        { name: "Global Administrator", email: "admin@tgc.com", pass: "admin123", role: "admin", pos: "Director", status: "active" }
+    // --- DATABASE & ENGINE ---
+    let users = JSON.parse(localStorage.getItem('tgc_sys_users')) || [
+      { name: "Global Admin", email: "admin@tgc.com", pass: "admin123", role: "admin", pos: "Director", status: "active" }
     ];
-    let entries = JSON.parse(localStorage.getItem('tgc_v3_entries')) || [];
+    let logs = JSON.parse(localStorage.getItem('tgc_sys_logs')) || [];
+    let currentUser = null;
 
-    const sync = () => {
-        localStorage.setItem('tgc_v3_users', JSON.stringify(users));
-        localStorage.setItem('tgc_v3_entries', JSON.stringify(entries));
+    const save = () => {
+      localStorage.setItem('tgc_sys_users', JSON.stringify(users));
+      localStorage.setItem('tgc_sys_logs', JSON.stringify(logs));
     };
 
-    // --- NAVIGATION & UI ---
-    function toggleAuth(isReg) {
-        document.getElementById('registerForm').classList.toggle('hidden', !isReg);
-        document.getElementById('loginForm').classList.toggle('hidden', isReg);
-        document.getElementById('authError').classList.add('hidden');
-    }
-
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('sidebar-open');
-    }
-
-    // --- AUTH ACTIONS ---
-    document.getElementById('registerForm').onsubmit = (e) => {
-        e.preventDefault();
-        const email = document.getElementById('regEmail').value.trim().toLowerCase();
-        if(users.find(u => u.email === email)) return alert("Email already exists!");
-        users.push({
-            name: document.getElementById('regName').value,
-            pos: document.getElementById('regPos').value,
-            email: email,
-            pass: document.getElementById('regPass').value,
-            role: 'employee',
-            status: 'active'
-        });
-        sync();
-        alert("Success! Now please login.");
-        toggleAuth(false);
+    // --- SESSION CHECK ---
+    window.onload = () => {
+      const sess = localStorage.getItem('tgc_session');
+      if(sess) {
+        const u = users.find(x => x.email === JSON.parse(sess).email && x.status === 'active');
+        if(u) { currentUser = u; init(); }
+        else { localStorage.removeItem('tgc_session'); }
+      }
+      lucide.createIcons();
     };
 
+    // --- AUTH ---
     document.getElementById('loginForm').onsubmit = (e) => {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-        const pass = document.getElementById('loginPass').value;
-        const u = users.find(x => x.email === email && x.pass === pass);
-        
-        if(!u) return alert("Invalid credentials.");
-        if(u.status === 'restricted') return alert("This account has been restricted by Admin.");
-        
-        currentUser = u;
-        init();
+      e.preventDefault();
+      const u = users.find(x => x.email === document.getElementById('lEmail').value.toLowerCase() && x.pass === document.getElementById('lPass').value);
+      if(!u) return msg("Invalid Credentials", "red");
+      if(u.status === 'restricted') return msg("Account Suspended", "red");
+      currentUser = u;
+      localStorage.setItem('tgc_session', JSON.stringify(u));
+      init();
     };
+
+    document.getElementById('regForm').onsubmit = (e) => {
+      e.preventDefault();
+      const email = document.getElementById('rEmail').value.toLowerCase();
+      if(users.find(x => x.email === email)) return msg("Email taken", "red");
+      users.push({
+        name: document.getElementById('rName').value,
+        pos: document.getElementById('rPos').value,
+        email: email,
+        pass: document.getElementById('rPass').value,
+        role: "employee", status: "active"
+      });
+      save();
+      msg("Registration Success", "green");
+      swapAuth(false);
+    };
+
+    function msg(t, c) {
+      const b = document.getElementById('authMsg');
+      b.innerText = t;
+      b.className = `mb-6 p-4 rounded-2xl text-xs font-bold text-center border bg-${c}-50 text-${c}-600 border-${c}-100 block`;
+    }
 
     function init() {
-        document.getElementById('authSection').classList.add('hidden');
-        document.getElementById('mainApp').classList.remove('hidden');
-        document.getElementById('userName').innerText = currentUser.name;
-        document.getElementById('userPos').innerText = currentUser.pos;
-        document.getElementById('userInitial').innerText = currentUser.name.charAt(0);
-        if(currentUser.role === 'admin') document.getElementById('adminMenu').classList.remove('hidden');
-        lucide.createIcons();
-        showTab('dashboard');
+      document.getElementById('authLayer').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      document.getElementById('uName').innerText = currentUser.name;
+      document.getElementById('uPos').innerText = currentUser.pos;
+      document.getElementById('uInit').innerText = currentUser.name.charAt(0);
+      if(currentUser.role === 'admin') document.getElementById('adminPanel').classList.remove('hidden');
+      tab('dash');
     }
 
-    function showTab(tab) {
-        const views = ['dashboardView', 'listView'];
-        views.forEach(v => document.getElementById(v).classList.add('hidden'));
-        document.getElementById('addTimeBtn').classList.add('hidden');
-        
-        document.querySelectorAll('.nav-btn, [id^="nav-"]').forEach(b => b?.classList.remove('nav-active'));
-        document.getElementById(`nav-${tab}`)?.classList.add('nav-active');
+    // --- UI ENGINE ---
+    function tab(t) {
+      const views = ['dashView', 'tableView'];
+      views.forEach(v => document.getElementById(v).classList.add('hidden'));
+      document.getElementById('addBtn').classList.add('hidden');
+      document.querySelectorAll('[id^="m-"]').forEach(n => n.classList.remove('nav-item-active'));
+      document.getElementById(`m-${t}`).classList.add('nav-item-active');
 
-        if(tab === 'dashboard') {
-            document.getElementById('dashboardView').classList.remove('hidden');
-            document.getElementById('viewTitle').innerText = "System Overview";
-            updateStats();
-        } else if (tab === 'timesheet') {
-            document.getElementById('listView').classList.remove('hidden');
-            document.getElementById('addTimeBtn').classList.remove('hidden');
-            document.getElementById('viewTitle').innerText = "My Timesheet";
-            renderEmployeeLogs();
-        } else if (tab === 'manage') {
-            document.getElementById('listView').classList.remove('hidden');
-            document.getElementById('viewTitle').innerText = "Team Management";
-            renderAdminUserList();
-        } else if (tab === 'approvals') {
-            document.getElementById('listView').classList.remove('hidden');
-            document.getElementById('viewTitle').innerText = "Pending Approvals";
-            renderApprovals();
-        }
-        if(window.innerWidth < 1024) toggleSidebar();
+      if(t === 'dash') {
+        document.getElementById('dashView').classList.remove('hidden');
+        document.getElementById('viewT').innerText = "Dashboard";
+        document.getElementById('viewS').innerText = "Enterprise performance metrics.";
+        renderStats();
+      } else if (t === 'logs') {
+        document.getElementById('tableView').classList.remove('hidden');
+        document.getElementById('addBtn').classList.remove('hidden');
+        document.getElementById('viewT').innerText = "My Activity";
+        renderLogs();
+      } else if (t === 'directory') {
+        document.getElementById('tableView').classList.remove('hidden');
+        document.getElementById('viewT').innerText = "Team Directory";
+        renderDirectory();
+      } else if (t === 'verify') {
+        document.getElementById('tableView').classList.remove('hidden');
+        document.getElementById('viewT').innerText = "Queue";
+        renderVerifications();
+      }
+      lucide.createIcons();
     }
 
-    function updateStats() {
-        const myEntries = entries.filter(e => e.email === currentUser.email);
-        document.getElementById('statHours').innerText = myEntries.reduce((a,b) => a + Number(b.hours), 0);
-        document.getElementById('statEntries').innerText = myEntries.length;
+    function renderStats() {
+      const mine = logs.filter(l => l.email === currentUser.email);
+      document.getElementById('sHours').innerText = mine.reduce((a,b) => a + Number(b.hrs), 0);
+      document.getElementById('sTasks').innerText = mine.filter(l => l.status === 'approved').length;
     }
 
-    // --- TABLE GENERATION ---
-    function renderEmployeeLogs() {
-        document.getElementById('tableHead').innerHTML = `<th class="p-6">Date</th><th class="p-6">Description</th><th class="p-6">Hours</th><th class="p-6">Status</th>`;
-        const mine = entries.filter(e => e.email === currentUser.email);
-        document.getElementById('tableBody').innerHTML = mine.reverse().map(e => `
-            <tr class="hover:bg-slate-50 transition">
-                <td class="p-6 font-bold" data-label="Date">${e.date}</td>
-                <td class="p-6 text-slate-500" data-label="Task">${e.desc}</td>
-                <td class="p-6 font-black" data-label="Hours">${e.hours}h</td>
-                <td class="p-6" data-label="Status"><span class="status-${e.status} px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">${e.status}</span></td>
-            </tr>
-        `).join('') || `<tr><td colspan="4" class="p-20 text-center text-slate-400">No logs found.</td></tr>`;
+    function renderLogs() {
+      document.getElementById('tHead').innerHTML = `<th class="p-6">Date</th><th class="p-6">Task</th><th class="p-6 text-center">Hours</th><th class="p-6">Status</th>`;
+      const mine = logs.filter(l => l.email === currentUser.email);
+      document.getElementById('tBody').innerHTML = mine.reverse().map(l => `
+        <tr class="border-b border-slate-50">
+          <td class="p-6 font-bold text-slate-700">${l.date}</td>
+          <td class="p-6 text-slate-500">${l.desc}</td>
+          <td class="p-6 text-center font-black">${l.hrs}h</td>
+          <td class="p-6"><span class="badge-${l.status} px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-tighter">${l.status}</span></td>
+        </tr>
+      `).join('') || `<tr><td colspan="4" class="p-20 text-center text-slate-300">No logs found.</td></tr>`;
     }
 
-    function renderAdminUserList() {
-        document.getElementById('tableHead').innerHTML = `<th class="p-6">Employee Info</th><th class="p-6">Position</th><th class="p-6">Total Hrs</th><th class="p-6">Action</th>`;
-        document.getElementById('tableBody').innerHTML = users.filter(u => u.role !== 'admin').map(u => {
-            const h = entries.filter(e => e.email === u.email).reduce((a,b) => a + Number(b.hours), 0);
-            return `
-                <tr class="hover:bg-slate-50 transition">
-                    <td class="p-6" data-label="Employee"><div class="font-bold">${u.name}</div><div class="text-[10px] text-slate-400">${u.email}</div></td>
-                    <td class="p-6" data-label="Position"><span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold">${u.pos}</span></td>
-                    <td class="p-6 font-black text-lg" data-label="Hours">${h}h</td>
-                    <td class="p-6" data-label="Access">
-                        <button onclick="toggleRestriction('${u.email}')" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase transition shadow-sm ${u.status === 'active' ? 'bg-slate-100 text-slate-600' : 'bg-red-600 text-white'}">
-                            ${u.status === 'active' ? 'Limit Access' : 'Restore Account'}
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
+    function renderDirectory() {
+      document.getElementById('tHead').innerHTML = `<th class="p-6">Employee</th><th class="p-6">Position</th><th class="p-6 text-center">Total Hours</th><th class="p-6 text-right">Access</th>`;
+      document.getElementById('tBody').innerHTML = users.filter(u => u.role !== 'admin').map(u => {
+        const h = logs.filter(l => l.email === u.email && l.status === 'approved').reduce((a,b) => a + Number(b.hrs), 0);
+        return `
+          <tr class="border-b border-slate-50">
+            <td class="p-6"><div class="font-bold">${u.name}</div><div class="text-[10px] text-slate-400">${u.email}</div></td>
+            <td class="p-6"><span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold">${u.pos}</span></td>
+            <td class="p-6 text-center font-black">${h}h</td>
+            <td class="p-6 text-right"><button onclick="toggleUser('${u.email}')" class="px-5 py-2 rounded-xl text-[10px] font-black uppercase transition ${u.status === 'active' ? 'bg-slate-100 text-slate-600' : 'bg-red-600 text-white'}">${u.status === 'active' ? 'Limit Access' : 'Restricted'}</button></td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    function renderApprovals() {
-        document.getElementById('tableHead').innerHTML = `<th class="p-6">Staff</th><th class="p-6">Date</th><th class="p-6">Hours</th><th class="p-6 text-right">Verification</th>`;
-        const pending = entries.filter(e => e.status === 'pending');
-        document.getElementById('tableBody').innerHTML = pending.map(e => `
-            <tr>
-                <td class="p-6" data-label="Staff"><div class="font-bold">${e.name}</div><div class="text-[10px] text-slate-400">${e.desc}</div></td>
-                <td class="p-6 font-medium" data-label="Date">${e.date}</td>
-                <td class="p-6 font-black" data-label="Hours">${e.hours}h</td>
-                <td class="p-6 text-right space-x-2" data-label="Actions">
-                    <button onclick="updateLog('${e.id}', 'approved')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">Approve</button>
-                    <button onclick="updateLog('${e.id}', 'rejected')" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase">Void</button>
-                </td>
-            </tr>
-        `).join('') || `<tr><td colspan="4" class="p-20 text-center text-slate-400">All caught up!</td></tr>`;
+    function renderVerifications() {
+      document.getElementById('tHead').innerHTML = `<th class="p-6">Staff</th><th class="p-6">Task</th><th class="p-6">Date</th><th class="p-6 text-right">Actions</th>`;
+      const p = logs.filter(l => l.status === 'pending');
+      document.getElementById('tBody').innerHTML = p.map(l => `
+        <tr class="border-b">
+          <td class="p-6 font-bold">${l.name}</td>
+          <td class="p-6 text-slate-500">${l.desc} (${l.hrs}h)</td>
+          <td class="p-6 font-medium">${l.date}</td>
+          <td class="p-6 text-right space-x-2">
+            <button onclick="updateL('${l.id}', 'approved')" class="bg-blue-600 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase">Approve</button>
+            <button onclick="updateL('${l.id}', 'rejected')" class="bg-red-50 text-red-600 px-5 py-2 rounded-xl text-[10px] font-black uppercase">Void</button>
+          </td>
+        </tr>
+      `).join('') || `<tr><td colspan="4" class="p-20 text-center text-slate-300 uppercase font-black tracking-widest">Queue Clear</td></tr>`;
     }
 
-    // --- ACTIONS ---
-    function toggleRestriction(email) {
-        const u = users.find(x => x.email === email);
-        u.status = u.status === 'active' ? 'restricted' : 'active';
-        sync(); renderAdminUserList();
+    // --- DATA ACTIONS ---
+    function toggleUser(e) {
+      const u = users.find(x => x.email === e);
+      u.status = u.status === 'active' ? 'restricted' : 'active';
+      save(); renderDirectory();
     }
 
-    function updateLog(id, s) {
-        entries.find(e => e.id === id).status = s;
-        sync(); renderApprovals();
+    function updateL(id, s) {
+      logs.find(x => x.id === id).status = s;
+      save(); renderVerifications();
     }
 
-    document.getElementById('tsForm').onsubmit = (e) => {
-        e.preventDefault();
-        entries.push({
-            id: Date.now().toString(),
-            email: currentUser.email,
-            name: currentUser.name,
-            date: document.getElementById('tsDate').value,
-            hours: document.getElementById('tsHours').value,
-            desc: document.getElementById('tsDesc').value,
-            status: 'pending'
-        });
-        sync(); closeModal(); showTab('timesheet');
+    document.getElementById('taskForm').onsubmit = (e) => {
+      e.preventDefault();
+      logs.push({
+        id: Date.now().toString(),
+        email: currentUser.email,
+        name: currentUser.name,
+        date: document.getElementById('tDate').value,
+        hrs: document.getElementById('tHrs').value,
+        desc: document.getElementById('tDesc').value,
+        status: "pending"
+      });
+      save(); closeM(); tab('logs');
     };
 
-    function openModal() { document.getElementById('modal').classList.remove('hidden'); }
-    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-    function logout() { location.reload(); }
+    function swapAuth(r) { document.getElementById('loginForm').classList.toggle('hidden', r); document.getElementById('regForm').classList.toggle('hidden', !r); }
+    function logout() { localStorage.removeItem('tgc_session'); location.reload(); }
+    function openM() { document.getElementById('modal').classList.remove('hidden'); }
+    function closeM() { document.getElementById('modal').classList.add('hidden'); }
+    function toggleSide() { document.getElementById('sidebar').classList.toggle('sidebar-open'); }
   </script>
 </body>
 </html>
