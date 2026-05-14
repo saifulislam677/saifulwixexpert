@@ -2,256 +2,266 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TGC Employee Portal | Fully Functional</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>TGC Enterprise Portal - Admin & Employee Sync</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --sidebar-bg: #05162B; --sidebar-text: #FFFFFF; --main-bg: #F5F7FA;
-      --primary: #1E3A5F; --primary-hover: #162d4a; --success: #10B981;
-      --danger: #EF4444; --warning: #F59E0B; --border: #E5E7EB;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body { background: var(--main-bg); color: #1F2937; }
-    .hidden { display: none !important; }
-
-    /* Auth Styles */
-    .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--sidebar-bg); }
-    .auth-card { background: white; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-    
-    /* Layout Styles */
-    .app-container { display: flex; min-height: 100vh; }
-    .sidebar { width: 260px; background: var(--sidebar-bg); color: white; position: fixed; height: 100vh; transition: 0.3s; }
-    .main-content { flex: 1; margin-left: 260px; padding: 40px; }
-    
-    /* Navigation */
-    .nav-item { padding: 12px 24px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: #9CA3AF; transition: 0.2s; }
-    .nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
-    .nav-item.active { background: rgba(59, 130, 246, 0.1); color: #3B82F6; border-left: 4px solid #3B82F6; }
-
-    /* Tables & Cards */
-    .card { background: white; border-radius: 10px; padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-    .table-container { background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
-    table { width: 100%; border-collapse: collapse; }
-    th { background: #F9FAFB; padding: 12px 20px; text-align: left; font-size: 12px; color: #6B7280; text-transform: uppercase; }
-    td { padding: 16px 20px; border-top: 1px solid var(--border); font-size: 14px; }
-    
-    /* UI Elements */
-    .btn { padding: 10px 20px; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .status-pill { padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 600; }
-    .pending { background: #FEF3C7; color: #92400E; }
-    .approved { background: #D1FAE5; color: #065F46; }
-    
-    /* Modal */
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
-    .modal { background: white; border-radius: 12px; width: 450px; padding: 30px; }
-    input, textarea, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 15px; }
+    body { font-family: 'Inter', sans-serif; }
+    .nav-active { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-left: 4px solid #3b82f6; }
+    .status-active { background: #d1fae5; color: #065f46; }
+    .status-restricted { background: #fee2e2; color: #991b1b; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .animate-in { animation: fadeIn 0.3s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
-<body>
+<body class="bg-[#F8FAFC] text-[#1E293B]">
 
-  <div id="authSection" class="auth-screen">
-    <div class="auth-card">
-      <h2 style="margin-bottom: 8px;">Welcome Back</h2>
-      <p style="color: #6B7280; margin-bottom: 24px; font-size: 14px;">Log in to your TGC Account</p>
-      <form id="loginForm">
-        <label style="font-size: 13px; font-weight: 500;">Email Address</label>
-        <input type="email" id="email" placeholder="admin@tgc.com" required>
-        <label style="font-size: 13px; font-weight: 500;">Password</label>
-        <input type="password" id="password" placeholder="••••••••" required>
-        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Sign In</button>
+  <div id="authSection" class="min-h-screen flex items-center justify-center bg-[#0F172A] p-6">
+    <div class="bg-white w-full max-w-md rounded-3xl p-10 shadow-2xl">
+      <div class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-[#0F172A] tracking-tight">TGC <span class="text-blue-600">PRO</span></h1>
+        <p id="authSubtitle" class="text-slate-500 mt-2 font-medium">Enterprise Resource Management</p>
+      </div>
+
+      <div id="authError" class="hidden mb-6 bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold border border-red-100 text-center"></div>
+
+      <form id="registerForm" class="space-y-5">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Full Name</label>
+                <input type="text" id="regName" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe" required>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Position</label>
+                <input type="text" id="regPos" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="Developer" required>
+            </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Work Email</label>
+          <input type="email" id="regEmail" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="name@tgc.com" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Password</label>
+          <input type="password" id="regPass" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">Create Account</button>
+        <p class="text-center text-sm font-medium mt-6">Already on the team? <button type="button" onclick="toggleAuth(false)" class="text-blue-600 font-bold">Sign In</button></p>
       </form>
-      <p id="loginError" style="color: var(--danger); font-size: 12px; margin-top: 15px; text-align: center;" class="hidden">Invalid email or password</p>
+
+      <form id="loginForm" class="space-y-5 hidden">
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Email Address</label>
+          <input type="email" id="loginEmail" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-1">Password</label>
+          <input type="password" id="loginPass" class="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <button type="submit" class="w-full bg-[#0F172A] text-white p-4 rounded-xl font-bold hover:bg-slate-800 transition">Access Portal</button>
+        <p class="text-center text-sm font-medium mt-6">New employee? <button type="button" onclick="toggleAuth(true)" class="text-blue-600 font-bold">Register</button></p>
+      </form>
     </div>
   </div>
 
-  <div id="appSection" class="app-container hidden">
-    <aside class="sidebar">
-      <div style="padding: 30px 24px; font-size: 22px; font-weight: 700; letter-spacing: -0.5px;">TGC <span style="color: #3B82F6;">Portal</span></div>
-      <nav id="navMenu">
-        <div class="nav-item active" onclick="switchTab('dashboard')"><i data-lucide="layout-dashboard"></i> Dashboard</div>
-        <div class="nav-item" onclick="switchTab('timesheets')"><i data-lucide="clock"></i> My Timesheets</div>
-        <div id="adminOnly" class="hidden">
-            <div style="padding: 20px 24px 10px; font-size: 11px; color: #4B5563; font-weight: 700; text-transform: uppercase;">Management</div>
-            <div class="nav-item" onclick="switchTab('approvals')"><i data-lucide="check-square"></i> Pending Approvals</div>
+  <div id="mainApp" class="hidden flex min-h-screen">
+    <aside class="w-72 bg-[#0F172A] text-slate-400 flex flex-col fixed h-full z-40">
+      <div class="p-8 text-white text-2xl font-black italic tracking-tighter">TGC <span class="text-blue-500">SYSTEMS</span></div>
+      
+      <nav class="flex-1 px-4 space-y-2">
+        <div onclick="showTab('dashboard')" id="nav-dashboard" class="nav-active p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold transition-all"><i data-lucide="layout-grid" class="w-5"></i> Dashboard</div>
+        <div onclick="showTab('timesheet')" id="nav-timesheet" class="p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold hover:bg-white/5 hover:text-white transition-all"><i data-lucide="activity" class="w-5"></i> My Activity</div>
+        
+        <div id="adminMenu" class="hidden pt-8">
+            <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Administration</p>
+            <div onclick="showTab('manage-employees')" id="nav-manage" class="p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold hover:bg-white/5 hover:text-white transition-all"><i data-lucide="users" class="w-5"></i> Team Directory</div>
+            <div onclick="showTab('approvals')" id="nav-approvals" class="p-4 rounded-xl flex items-center gap-3 cursor-pointer font-bold hover:bg-white/5 hover:text-white transition-all"><i data-lucide="file-check" class="w-5"></i> Time Approvals</div>
         </div>
       </nav>
-      <div style="position: absolute; bottom: 0; width: 100%; padding: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
-        <div id="userName" style="font-size: 14px; margin-bottom: 12px; font-weight: 500;"></div>
-        <button onclick="logout()" class="btn" style="background: rgba(239, 68, 68, 0.1); color: #EF4444; width: 100%; font-size: 13px;">Logout</button>
+
+      <div class="p-8 bg-black/20">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold" id="userInitial">U</div>
+            <div>
+                <p id="userName" class="text-sm font-bold text-white truncate w-32"></p>
+                <p id="userRole" class="text-[10px] uppercase font-black text-slate-500"></p>
+            </div>
+        </div>
+        <button onclick="logout()" class="w-full flex items-center justify-center gap-2 text-xs font-bold text-red-400 hover:text-red-300 transition"><i data-lucide="power" class="w-4"></i> DISCONNECT</button>
       </div>
     </aside>
 
-    <main class="main-content">
-      <header id="viewHeader" style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
-        <h1 id="viewTitle" style="font-size: 24px; font-weight: 700; color: #111827;">Dashboard Overview</h1>
-        <button id="addEntryBtn" onclick="openModal()" class="btn btn-primary hidden">+ New Entry</button>
-      </header>
-
-      <div id="dashboardView">
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;" id="statsGrid">
-          </div>
+    <main class="flex-1 ml-72 p-12">
+      <div class="flex justify-between items-end mb-12">
+        <div>
+            <h2 id="viewTitle" class="text-4xl font-black text-[#0F172A]">Overview</h2>
+            <p id="viewSubtitle" class="text-slate-500 mt-2 font-medium">Real-time statistics and activity data.</p>
+        </div>
+        <button id="addTimeBtn" onclick="openModal()" class="hidden bg-blue-600 text-white px-8 py-3 rounded-2xl font-bold shadow-xl shadow-blue-100 hover:scale-105 transition flex items-center gap-2"><i data-lucide="plus"></i> New Slot</button>
       </div>
 
-      <div id="listView" class="table-container hidden">
-        <table id="dataTable">
-          <thead id="tableHead"></thead>
-          <tbody id="tableBody"></tbody>
+      <div id="dashboardView" class="grid grid-cols-1 md:grid-cols-3 gap-8 animate-in">
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+            <p class="text-slate-400 text-xs font-black uppercase tracking-widest">Logged Hours</p>
+            <h3 id="statHours" class="text-5xl font-black mt-2 text-[#0F172A]">0</h3>
+        </div>
+        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+            <p class="text-slate-400 text-xs font-black uppercase tracking-widest">Active Entries</p>
+            <h3 id="statEntries" class="text-5xl font-black mt-2 text-blue-600">0</h3>
+        </div>
+        <div id="statusCard" class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+            <p class="text-slate-400 text-xs font-black uppercase tracking-widest">Account Integrity</p>
+            <h3 id="statStatus" class="text-5xl font-black mt-2 text-green-500">CLEAR</h3>
+        </div>
+      </div>
+
+      <div id="listView" class="hidden bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden animate-in">
+        <table class="w-full text-left">
+          <thead class="bg-slate-50/50 border-b border-slate-100">
+            <tr id="tableHead" class="text-[11px] font-black uppercase text-slate-400 tracking-widest"></tr>
+          </thead>
+          <tbody id="tableBody" class="text-sm font-medium"></tbody>
         </table>
       </div>
     </main>
   </div>
 
-  <div id="tsModal" class="modal-backdrop hidden">
-    <div class="modal">
-      <h3 style="margin-bottom: 20px;">Submit Timesheet</h3>
-      <form id="timesheetForm">
-        <label>Date</label>
-        <input type="date" id="tsDate" required>
-        <label>Hours Worked</label>
-        <input type="number" id="tsHours" min="1" max="24" placeholder="8" required>
-        <label>Task Description</label>
-        <textarea id="tsDesc" rows="3" placeholder="Describe what you worked on..." required></textarea>
-        <div style="display: flex; gap: 12px; margin-top: 10px;">
-          <button type="button" onclick="closeModal()" class="btn" style="background: #E5E7EB; flex: 1;">Cancel</button>
-          <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Entry</button>
+  <div id="modal" class="fixed inset-0 bg-[#0F172A]/90 hidden flex items-center justify-center p-6 z-50 backdrop-blur-md">
+    <div class="bg-white w-full max-w-lg rounded-3xl p-10 shadow-2xl">
+      <h3 class="text-3xl font-black mb-8 text-[#0F172A]">Log Work Session</h3>
+      <form id="tsForm" class="space-y-6">
+        <div class="grid grid-cols-2 gap-6">
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Work Date</label>
+                <input type="date" id="tsDate" class="w-full p-4 border rounded-2xl outline-none" required>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Hours</label>
+                <input type="number" id="tsHours" class="w-full p-4 border rounded-2xl outline-none" min="1" max="24" required>
+            </div>
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Description of Activity</label>
+            <textarea id="tsDesc" class="w-full p-4 border rounded-2xl outline-none" rows="4" placeholder="Briefly describe your tasks..." required></textarea>
+        </div>
+        <div class="flex gap-4 pt-4">
+          <button type="button" onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400">Dismiss</button>
+          <button type="submit" class="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-100">Submit Log</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    // --- APP STATE & DATABASE ---
+    // --- DATABASE (Persistence) ---
     let currentUser = null;
-    let data = JSON.parse(localStorage.getItem('tgc_data')) || {
-      users: [
-        { id: 1, name: 'TGC Admin', email: 'admin@tgc.com', password: 'admin123', role: 'admin' },
-        { id: 2, name: 'John Employee', email: 'user@tgc.com', password: 'user123', role: 'employee' }
-      ],
-      entries: []
+    let users = JSON.parse(localStorage.getItem('tgc_sys_users')) || [
+        { name: "Global Administrator", email: "admin@tgc.com", pass: "admin123", role: "admin", pos: "Director", status: "active" }
+    ];
+    let entries = JSON.parse(localStorage.getItem('tgc_sys_entries')) || [];
+
+    const sync = () => {
+        localStorage.setItem('tgc_sys_users', JSON.stringify(users));
+        localStorage.setItem('tgc_sys_entries', JSON.stringify(entries));
     };
 
-    const save = () => localStorage.setItem('tgc_data', JSON.stringify(data));
+    // --- AUTH ---
+    function toggleAuth(isReg) {
+        document.getElementById('registerForm').classList.toggle('hidden', !isReg);
+        document.getElementById('loginForm').classList.toggle('hidden', isReg);
+        document.getElementById('authError').classList.add('hidden');
+    }
 
-    // --- AUTH LOGIC ---
+    document.getElementById('registerForm').onsubmit = (e) => {
+        e.preventDefault();
+        const email = document.getElementById('regEmail').value.trim().toLowerCase();
+        if(users.find(u => u.email === email)) {
+            showAuthErr("This email is already registered to an employee.");
+            return;
+        }
+        users.push({
+            name: document.getElementById('regName').value,
+            pos: document.getElementById('regPos').value,
+            email: email,
+            pass: document.getElementById('regPass').value,
+            role: 'employee',
+            status: 'active'
+        });
+        sync();
+        alert("Registration complete. You can now login.");
+        toggleAuth(false);
+    };
+
     document.getElementById('loginForm').onsubmit = (e) => {
-      e.preventDefault();
-      const u = data.users.find(x => x.email === email.value && x.password === password.value);
-      if (u) {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        const pass = document.getElementById('loginPass').value;
+        const u = users.find(x => x.email === email && x.pass === pass);
+        
+        if(!u) return showAuthErr("Invalid credentials. Try again.");
+        if(u.status === 'restricted') return showAuthErr("ACCOUNT SUSPENDED: Contact Admin.");
+        
         currentUser = u;
-        initApp();
-      } else {
-        document.getElementById('loginError').classList.remove('hidden');
-      }
+        init();
     };
 
-    function initApp() {
-      document.getElementById('authSection').classList.add('hidden');
-      document.getElementById('appSection').classList.remove('hidden');
-      document.getElementById('userName').innerText = currentUser.name;
-      if (currentUser.role === 'admin') document.getElementById('adminOnly').classList.remove('hidden');
-      lucide.createIcons();
-      switchTab('dashboard');
+    function showAuthErr(msg) {
+        const box = document.getElementById('authError');
+        box.innerText = msg;
+        box.classList.remove('hidden');
     }
 
-    function logout() { location.reload(); }
-
-    // --- NAVIGATION & VIEWS ---
-    function switchTab(tab) {
-      const views = ['dashboardView', 'listView'];
-      views.forEach(v => document.getElementById(v).classList.add('hidden'));
-      document.getElementById('addEntryBtn').classList.add('hidden');
-      
-      const navItems = document.querySelectorAll('.nav-item');
-      navItems.forEach(i => i.classList.remove('active'));
-
-      if (tab === 'dashboard') {
-        document.getElementById('viewTitle').innerText = "Dashboard Overview";
-        document.getElementById('dashboardView').classList.remove('hidden');
-        renderDashboard();
-      } else if (tab === 'timesheets') {
-        document.getElementById('viewTitle').innerText = "My Timesheet History";
-        document.getElementById('listView').classList.remove('hidden');
-        document.getElementById('addEntryBtn').classList.remove('hidden');
-        renderTimesheets();
-      } else if (tab === 'approvals') {
-        document.getElementById('viewTitle').innerText = "Management Approvals";
-        document.getElementById('listView').classList.remove('hidden');
-        renderApprovals();
-      }
+    // --- APP INITIALIZATION ---
+    function init() {
+        document.getElementById('authSection').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        document.getElementById('userName').innerText = currentUser.name;
+        document.getElementById('userRole').innerText = currentUser.role;
+        document.getElementById('userInitial').innerText = currentUser.name.charAt(0);
+        if(currentUser.role === 'admin') document.getElementById('adminMenu').classList.remove('hidden');
+        lucide.createIcons();
+        showTab('dashboard');
     }
 
-    // --- DATA RENDERING ---
-    function renderDashboard() {
-      const myEntries = data.entries.filter(e => e.userId === currentUser.id);
-      const totalHours = myEntries.reduce((sum, e) => sum + Number(e.hours), 0);
-      const pending = myEntries.filter(e => e.status === 'pending').length;
+    function showTab(tab) {
+        const views = ['dashboardView', 'listView'];
+        views.forEach(v => document.getElementById(v).classList.add('hidden'));
+        document.getElementById('addTimeBtn').classList.add('hidden');
+        
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
+        const navId = tab === 'manage-employees' ? 'nav-manage' : `nav-${tab}`;
+        document.getElementById(navId)?.classList.add('nav-active');
 
-      document.getElementById('statsGrid').innerHTML = `
-        <div class="card"><h3>Total Hours</h3><p style="font-size: 24px; font-weight:700; color:var(--primary)">${totalHours}</p></div>
-        <div class="card"><h3>Submissions</h3><p style="font-size: 24px; font-weight:700; color:var(--success)">${myEntries.length}</p></div>
-        <div class="card"><h3>Pending</h3><p style="font-size: 24px; font-weight:700; color:var(--warning)">${pending}</p></div>
-      `;
+        if(tab === 'dashboard') {
+            document.getElementById('dashboardView').classList.remove('hidden');
+            document.getElementById('viewTitle').innerText = "System Overview";
+            updateStats();
+        } else if (tab === 'timesheet') {
+            document.getElementById('listView').classList.remove('hidden');
+            document.getElementById('addTimeBtn').classList.remove('hidden');
+            document.getElementById('viewTitle').innerText = "My Activity Log";
+            renderEmpTable();
+        } else if (tab === 'manage-employees') {
+            document.getElementById('listView').classList.remove('hidden');
+            document.getElementById('viewTitle').innerText = "Team Directory";
+            renderAdminUserTable();
+        } else if (tab === 'approvals') {
+            document.getElementById('listView').classList.remove('hidden');
+            document.getElementById('viewTitle').innerText = "Time Verification";
+            renderApprovals();
+        }
     }
 
-    function renderTimesheets() {
-      const myEntries = data.entries.filter(e => e.userId === currentUser.id);
-      document.getElementById('tableHead').innerHTML = `<tr><th>Date</th><th>Description</th><th>Hours</th><th>Status</th></tr>`;
-      document.getElementById('tableBody').innerHTML = myEntries.map(e => `
-        <tr>
-          <td>${e.date}</td>
-          <td>${e.desc}</td>
-          <td>${e.hours}h</td>
-          <td><span class="status-pill ${e.status}">${e.status}</span></td>
-        </tr>
-      `).join('') || `<tr><td colspan="4" style="text-align:center">No entries found</td></tr>`;
+    function updateStats() {
+        const myEntries = entries.filter(e => e.email === currentUser.email);
+        document.getElementById('statHours').innerText = myEntries.reduce((a,b) => a + Number(b.hours), 0);
+        document.getElementById('statEntries').innerText = myEntries.length;
     }
 
-    function renderApprovals() {
-      const pending = data.entries.filter(e => e.status === 'pending');
-      document.getElementById('tableHead').innerHTML = `<tr><th>Employee</th><th>Date</th><th>Hours</th><th>Action</th></tr>`;
-      document.getElementById('tableBody').innerHTML = pending.map(e => {
-        const user = data.users.find(u => u.id === e.userId);
-        return `
-          <tr>
-            <td><b>${user.name}</b></td>
-            <td>${e.date}</td>
-            <td>${e.hours}h</td>
-            <td>
-              <button onclick="process('${e.id}', 'approved')" class="btn" style="background:var(--success); color:white; padding:5px 12px; font-size:12px">Approve</button>
-            </td>
-          </tr>
-        `}).join('') || `<tr><td colspan="4" style="text-align:center">No pending approvals</td></tr>`;
-    }
-
-    // --- ACTIONS ---
-    function openModal() { document.getElementById('tsModal').classList.remove('hidden'); }
-    function closeModal() { document.getElementById('tsModal').classList.add('hidden'); }
-
-    document.getElementById('timesheetForm').onsubmit = (e) => {
-      e.preventDefault();
-      data.entries.push({
-        id: Date.now().toString(),
-        userId: currentUser.id,
-        date: document.getElementById('tsDate').value,
-        hours: document.getElementById('tsHours').value,
-        desc: document.getElementById('tsDesc').value,
-        status: 'pending'
-      });
-      save();
-      closeModal();
-      switchTab('timesheets');
-    };
-
-    function process(id, status) {
-      const idx = data.entries.findIndex(e => e.id === id);
-      data.entries[idx].status = status;
-      save();
-      renderApprovals();
-    }
-  </script>
-</body>
-</html>
+    // --- TABLE RENDERING ---
+    function renderEmpTable() {
+        document.getElementById('tableHead').innerHTML = `<th class="p-6">Date</th><th class="p-6">Description</th><th class="p-6 text-center">Hours</th><th class="p-6">Status</th>`;
+        const myEntries = entries.filter(e => e.email === currentUser.email);
+        document.getElementById('tableBody').innerHTML
